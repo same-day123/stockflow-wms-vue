@@ -2,7 +2,7 @@
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
 <script lang="ts">
-  import { defineComponent, PropType, ref, Ref, reactive, watchEffect } from 'vue';
+  import { defineComponent, PropType, ref, Ref, reactive, watch, onMounted, nextTick } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
   export default defineComponent({
@@ -33,7 +33,7 @@
     },
     setup(props) {
       const chartRef = ref<HTMLDivElement | null>(null);
-      const { setOptions, echarts } = useECharts(chartRef as Ref<HTMLDivElement>);
+      const { setOptions, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
       const option = reactive({
         tooltip: {
           trigger: 'axis',
@@ -62,8 +62,24 @@
         ],
       });
 
-      watchEffect(() => {
-        props.chartData && initCharts();
+      // 旧实现使用 watchEffect，在 Tab 初次隐藏时可能拿到高度为 0 的容器，
+      // 导致 ECharts 只绘制坐标轴，切换回来后也不会自动恢复。
+      // watchEffect(() => {
+      //   props.chartData && initCharts();
+      // });
+
+      watch(
+        () => props.chartData,
+        () => {
+          initCharts();
+        },
+        { deep: true, immediate: true },
+      );
+
+      onMounted(() => {
+        nextTick(() => {
+          initCharts();
+        });
       });
 
       function initCharts() {
@@ -81,7 +97,11 @@
         option.series[0].color = props.seriesColor;
         // update-end--author:liaozhiyang---date:20240407---for：【QQYUN-8762】首页默认及echars颜色调整
         option.xAxis.data = xAxisData;
-        setOptions(option);
+        nextTick(() => {
+          setOptions(option);
+          // 等待 Tab/Card 完成布局后重新计算图表尺寸。
+          window.requestAnimationFrame(() => resize());
+        });
       }
       return { chartRef };
     },

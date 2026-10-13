@@ -1,7 +1,10 @@
 <template>
   <div class="rank">
     <h4 class="title">{{ title }}</h4>
-    <ul class="list" :style="{ height: height ? `${height}px` : 'auto', overflow: 'auto' }">
+    <div v-if="loading" class="state">正在加载...</div>
+    <div v-else-if="error" class="state error">{{ error }}</div>
+    <div v-else-if="!list || list.length === 0" class="state">暂无排行榜数据</div>
+    <ul v-else class="list" :style="{ height: height ? `${height}px` : 'auto', overflow: 'auto' }">
       <li :key="index" v-for="(item, index) in list">
         <span :class="index < 3 ? 'active' : null">{{ index + 1 }}</span>
         <span>{{ item.name }}</span>
@@ -28,6 +31,14 @@
         type: Number,
         default: null,
       },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+      error: {
+        type: String,
+        default: '',
+      },
     },
   });
 </script>
@@ -35,6 +46,19 @@
 <style lang="less" scoped>
   .rank {
     padding: 0 32px 32px 72px;
+
+    .state {
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 14px;
+    }
+
+    .state.error {
+      color: #ff4d4f;
+    }
 
     .list {
       margin: 25px 0 0;
