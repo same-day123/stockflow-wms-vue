@@ -1,6 +1,6 @@
-# StarVMS 仓储管理系统（前端）
+# 储流 WMS（StockFlow）仓储管理系统 · 前端
 
-StarVMS 仓储管理系统的前端工程，基于 JeecgBoot-Vue3 二次开发，覆盖 WMS 全业务流程页面，并扩展了 IoT 监控大屏与 AI 智能助手对话界面。
+储流 WMS 的前端工程，基于 JeecgBoot-Vue3 二次开发，覆盖 WMS 全业务流程页面，并扩展了 IoT 监控大屏与 AI 智能助手对话界面。
 
 ## 技术栈
 
